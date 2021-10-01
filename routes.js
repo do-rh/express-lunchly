@@ -13,8 +13,6 @@ const router = new express.Router();
 
 router.get("/", async function (req, res, next) {
   const customers = await Customer.all();
-  //console.log("in solution routes file");
-  //console.log(customers);
   return res.render("customer_list.html", { customers });
 });
 
@@ -32,6 +30,21 @@ router.post("/add/", async function (req, res, next) {
   await customer.save();
 
   return res.redirect(`/${customer.id}/`);
+});
+
+/** Search for customers. */
+
+router.get("/search/", async function (req, res, next) {
+  const name = req.query.customerName;
+  // console.log("in get route: ", name);
+  const customers = await Customer.search(name);
+
+  return res.render("customer_list.html", { customers });
+});
+
+router.get("/top-ten/", async function (req, res, next) {
+  const customers = await Customer.topTen();
+  return res.render("customer_list.html", { customers });
 });
 
 /** Show a customer, given their ID. */
@@ -65,15 +78,6 @@ router.post("/:id/edit/", async function (req, res, next) {
   return res.redirect(`/${customer.id}/`);
 });
 
-/** Search for customers. */
-
-router.post("/search/", async function (req, res, next) {
-  const name = req.query.customerName;
-  console.log("in get route: ", name);
-  const customers = await Customer.search(name);
-
-  return res.render("customer_list.html", { customers });
-});
 
 /** Handle adding a new reservation. */
 
