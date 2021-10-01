@@ -56,33 +56,22 @@ class Customer {
 
     return new Customer(customer);
   }
-
+  /** Accepts a string and searches database for names that match
+   *  Returns result as an array of customer instances
+   */
   static async search(name) {
     let [fname, lname] = name.split(' ');
-    let results;
-    if (lname) {
-      results = await db.query(
-        `SELECT id,
+    lname = lname ? lname : fname; // helps reduce query repetition
+    const results = await db.query(
+      `SELECT id,
             first_name AS "firstName",
             last_name  AS "lastName",
             phone,
             notes
         FROM customers
-        WHERE (first_name ILIKE $1 AND last_name ILIKE $2)`,
-        [fname, lname] // how to handle a full name search?
-      );
-    } else {
-      results = await db.query(
-        `SELECT id,
-            first_name AS "firstName",
-            last_name  AS "lastName",
-            phone,
-            notes
-        FROM customers
-        WHERE first_name ILIKE $1 OR last_name ILIKE $1`,
-        [fname] // how to handle a full name search?
-      );
-    }
+        WHERE first_name ILIKE $1 OR last_name ILIKE $2`,
+      [`${fname}%`, `%${lname}%`] // how to handle a full name search?
+    );
 
     const customers = results.rows;
     if (customers === undefined) {
@@ -95,6 +84,9 @@ class Customer {
 
   }
 
+  /** Queries database for the ten customers with the most reservations
+   *  Returns array of top ten customer instances 
+   */
   static async topTen() {
     const results = await db.query(
       `SELECT customers.id,
@@ -110,7 +102,7 @@ class Customer {
 
     const customers = results.rows;
     if (customers === undefined) {
-      const err = new Error(`No such customer: ${name}`);
+      const err = new Error(`No such customer: ${name}`); // copy paste issue
       err.status = 404;
       throw err;
     }
@@ -161,7 +153,10 @@ class Customer {
       );
     }
   }
-
+  /** 
+   * Combines customer's first and last name and 
+   * Return as a single string for their full name
+   */
   fullName() {
     return (this.firstName + ' ' + this.lastName);
   }
