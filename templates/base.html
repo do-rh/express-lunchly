@@ -32,6 +32,13 @@
         <li class="nav-item">
           <a class="nav-link" href="/add/">Add a Customer</a>
         </li>
+        <li class="nav-item active">
+          <form action="/search/" method="POST">
+            <label for="customerName">Search customer by name: </label>
+            <input type="text" name="customerName" placeholder="Ex: John">
+            <button>Search</button>
+          </form>
+        </li>
       </ul>
     </div>
   </nav>
