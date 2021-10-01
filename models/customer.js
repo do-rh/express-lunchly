@@ -60,8 +60,8 @@ class Customer {
    *  Returns result as an array of customer instances
    */
   static async search(name) {
-    let [fname, lname] = name.split(' ');
-    lname = lname ? lname : fname; // helps reduce query repetition
+    // let [fname, lname] = name.split(' ');
+    // lname = lname ? lname : fname; // helps reduce query repetition
     const results = await db.query(
       `SELECT id,
             first_name AS "firstName",
@@ -69,8 +69,8 @@ class Customer {
             phone,
             notes
         FROM customers
-        WHERE first_name ILIKE $1 OR last_name ILIKE $2`,
-      [`${fname}%`, `%${lname}%`] // how to handle a full name search?
+        WHERE concat(first_name, ' ', last_name) ILIKE $1`,
+      [`%${name}%`]
     );
 
     const customers = results.rows;
@@ -100,12 +100,8 @@ class Customer {
         LIMIT 10;`
     );
 
+
     const customers = results.rows;
-    if (customers === undefined) {
-      const err = new Error(`No such customer: ${name}`); // copy paste issue
-      err.status = 404;
-      throw err;
-    }
     return customers.map(c => new Customer(c));
   }
 

@@ -42,6 +42,7 @@ router.get("/search/", async function (req, res, next) {
   return res.render("customer_list.html", { customers });
 });
 
+/** Show top ten customers with the most reservations */
 router.get("/top-ten/", async function (req, res, next) {
   const customers = await Customer.topTen();
   return res.render("customer_list.html", { customers });
